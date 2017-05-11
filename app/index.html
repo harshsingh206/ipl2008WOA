@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+.floating-box {
+    float: left;
+    width: 200px;
+    height: 200px;
+    margin: 10px;
+    border: 3px solid #73AD21;  
+    border-radius:10px;
+    background-color: white;
+}
+
+.after-box {
+    clear: left;
+    border: 3px solid;      
+}
+
+#inner {
+  margin: 0 auto;
+}
+#div2{
+ padding: 5px;
+ margin: 10px;
+}
+.loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+  from { bottom:-100px; opacity:0 } 
+  to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom { 
+  from{ bottom:-100px; opacity:0 } 
+  to{ bottom:0; opacity:1 }
+
+  td { text-align:center; }
+}
+</style>
+<body>
+<div ng-app="myApp" ng-controller="myCtrl">
+  <div ng-show="showloading">
+    <div class="loader"></div>
+  </div>    
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="showmatch" style="background-color:white">
+        <div><h1>IPL Matches</h1></div><hr>
+        </br></br></br>
+        <div class="container" ng-repeat="t in teammatchdata">
+          <div class="panel-group">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#collapse{{t.id}}"><b>Match{{t.id}} </b>- {{t.team1}} Vs {{t.team2}} at <b>{{t.venue}}</b></a>
+                </h4>
+              </div>
+              <div id="collapse{{t.id}}" class="panel-collapse collapse">
+                <div class="panel-body"><b>{{t.toss_winner}}</b> Won the toss and elected to <b>{{t.toss_decision}}</b> first<button style="float:right" ng-click="showdelivery(t.id)">Details</button></div>
+                <div class="panel-footer">{{t.winner}} Won the match by <span ng-if="t.win_by_wickets == 0">{{ t.win_by_runs}} runs.</span><span ng-if="t.win_by_runs == 0"> {{ t.win_by_wickets}} wickets.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="showdeliverydata">
+      <button ng-click="backoption()" style="position:absolute;left:0;top:0;">Back</button><br/></br></br></br>
+      <div><h1>Match Delivery Details</h1></div><hr>
+        </br></br></br>
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-repeat="d in matchdeliverydata">
+            <table>
+              <tr>
+                <td valign="top" class="col-lg-4 col-md-4 col-sm-4 col-xs-4"><span ng-if="d.inning == 1"><p><b>1st Inning</b><p><p>{{d.batting_team}}</p></span><span ng-if="d.inning == 2">{{}}<p><b>2nd Inning</b></p><p>{{d.batting_team}}</p></span></td>
+                <td valign="top" class="col-lg-2 col-md-2 col-sm-2 col-xs-2"><b>{{d.over}}.{{d.ball}}</b></td>
+                <td valign="top" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                  <p>Batsman:{{d.batsman}} Non-Striker:{{d.non_striker}}</p>
+                  <p><span ng-show="d.wide_runs > 0">{{d.wide_runs}} Wide Runs </span>
+                     <span ng-show="d.bye_runs > 0">{{d.bye_runs}} Bye Run </span>
+                     <span ng-show="d.legbye_runs > 0">{{d.legbye_runs}} Leg Bye Run </span>
+                     <span ng-show="d.noball_runs > 0">{{d.noball_runs}} No Ball Run </span>
+                     <span ng-show="d.batsman_runs > 0">{{d.batsman_runs}} Run by {{d.batsman}} </span>
+                  </p>
+                  <p>
+                    <span ng-show="d.dismissal_kind == 'caught'">{{d.batsman}} <b>OUT</b>. Caught by {{d.fielder}} ball by {{d.bowler}}</span>
+                    <span ng-show="d.dismissal_kind == 'bowled'">{{d.batsman}} <b>OUT</b>. Bowled by {{d.bowler}}</span>
+                    <span ng-show="d.dismissal_kind == 'run out'">{{d.batsman}} <b>OUT</b>. Run Out by {{d.fielder}}</span>
+
+                  </p>
+                </td>
+              </tr>
+            </table>         
+      </div>
+  </div>
+</div>
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http, $window) {
+$scope.showdeliverydata = false;
+$scope.showloading = true;
+$scope.showmatch = false;
+  $http({
+    method : "GET",
+    url : "http://localhost:3000/api/matches"
+  }).then(function mySucces(response) {
+      $scope.teammatchdata = response.data;
+    //  $scope.totalItems = $scope.teammatchdata.length;
+     console.log($scope.teammatchdata);
+    //  $scope.myWelcome.shift();
+      // console.log($scope.myWelcome);
+      //  console.log($scope.myWelcome[1].created_at);
+       
+       $scope.showloading = false;
+       $scope.showmatch = true;
+      
+    }, function myError(response) {
+      $scope.myWelcome = response.statusText;
+      
+  });
+
+$scope.showdelivery = function(id){
+   
+  $scope.showloading = true;
+  $scope.showmatch = false;
+  $http({
+    method : "GET",
+    url : "http://localhost:3000/api/deliveries/" + id
+  }).then(function mySucces(response) {
+      $scope.matchdeliverydata = response.data;
+      $scope.showloading = false;
+    //  $scope.totalItems = $scope.teammatchdata.length;
+     console.log($scope.matchdeliverydata);
+    //  $scope.myWelcome.shift();
+      // console.log($scope.myWelcome);
+      //  console.log($scope.myWelcome[1].created_at);
+       $scope.showdeliverydata = true;
+      
+    }, function myError(response) {
+      $scope.myWelcome = response.statusText;
+      
+  });
+}
+$scope.backoption = function(){
+  $window.location.reload();
+
+}
+
+$scope.showsearch = function (row) {
+            var query = angular.lowercase($scope.query);
+            return !!((angular.lowercase(row.title) != null && angular.lowercase(row.title).indexOf(query || '') !== -1));
+}
+
+$scope.sortBy = function(propertyName) {
+    $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
+    $scope.propertyName = propertyName;
+  };
+});
+
+</script>
+
+</body>
+</html>
